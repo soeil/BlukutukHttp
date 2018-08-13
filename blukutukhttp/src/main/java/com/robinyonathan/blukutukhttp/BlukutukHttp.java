@@ -176,31 +176,13 @@ public class BlukutukHttp {
                 }
             }
 
-            if (blukutukModel != null) {
+            if (blukutukModel != null && model != null) {
                 Boolean failedJsonTest = false;
 
-                JSONObject result = null;
-                try {
-                    result = new JSONObject((String) o);
-                } catch (JSONException e) {
-                    try {
-                        new JSONArray((String) o);
-                    } catch (JSONException e1) {
-                        failedJsonTest = true;
-                    }
-                }
+                Gson gson = new Gson();
+                Object modelResult = gson.fromJson((String) o, (Type) model);
 
-                if (failedJsonTest) {
-                    responseCode = 999;
-                    responseMessage = code("" + 999);
-
-                    blukutukFail.result(responseCode, responseMessage);
-                } else {
-                    Gson gson = new Gson();
-                    Object modelResult = gson.fromJson((String) o, (Type) model);
-
-                    blukutukModel.result(Primitives.wrap(model).cast(modelResult));
-                }
+                blukutukModel.result(Primitives.wrap(model).cast(modelResult));
             }
 
         } else {
