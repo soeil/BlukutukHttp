@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.Primitives;
@@ -45,6 +47,7 @@ public class BlukutukHttp {
     private BlukutukModel blukutukModel;
     private BlukutukUploadProgress blukutukUploadProgress;
     private BlukutukDownload blukutukDownload;
+    private ProgressBar progressBar;
 
     private static boolean isAcceptAllCertificate = false;
 
@@ -79,6 +82,10 @@ public class BlukutukHttp {
 
     public void setProgressDialog(ProgressDialog progressDialog) {
         this.progressDialog = progressDialog;
+    }
+
+    public void setProgressBar(ProgressBar progressBar) {
+        this.progressBar = progressBar;
     }
 
     public void setModel(Class model) {
@@ -127,7 +134,7 @@ public class BlukutukHttp {
     }
 
     private void processResult(Object o) {
-        if (!activity.isDestroyed() && responseMessage.length() == 0) {
+        if (responseMessage.length() == 0) {
             if (blukutukJsonObject != null) {
                 Boolean failedJsonTest = false;
 
@@ -231,24 +238,36 @@ public class BlukutukHttp {
         okHttp.setOkHttpInterface(new OkHttpInterface() {
             @Override
             public void before() {
-                if (progressDialog != null) {
-                    progressDialog.show();
+                if (!activity.isDestroyed()) {
+                    if (progressDialog != null) {
+                        progressDialog.show();
+                    }
+
+                    if (progressBar != null) {
+                        progressBar.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 
             @Override
             public void progress(int progress) {
-                if (blukutukUploadProgress != null) {
+                if (blukutukUploadProgress != null && !activity.isDestroyed()) {
                     blukutukUploadProgress.result(progress);
                 }
             }
 
             @Override
             public void after(Object o) {
-                processResult(o);
+                if (!activity.isDestroyed()) {
+                    processResult(o);
 
-                if (progressDialog != null) {
-                    progressDialog.dismiss();
+                    if (progressDialog != null) {
+                        progressDialog.dismiss();
+                    }
+
+                    if (progressBar != null) {
+                        progressBar.setVisibility(View.GONE);
+                    }
                 }
             }
         });
@@ -261,30 +280,42 @@ public class BlukutukHttp {
         okHttp.setOkHttpInterface(new OkHttpInterface() {
             @Override
             public void before() {
-                if (progressDialog != null) {
-                    progressDialog.show();
+                if (!activity.isDestroyed()) {
+                    if (progressDialog != null) {
+                        progressDialog.show();
+                    }
+
+                    if (progressBar != null) {
+                        progressBar.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 
             @Override
             public void progress(int progress) {
-                if (blukutukUploadProgress != null) {
+                if (blukutukUploadProgress != null && !activity.isDestroyed()) {
                     blukutukUploadProgress.result(progress);
                 }
             }
 
             @Override
             public void after(Object o) {
-                if (blukutukDownload != null) {
-                    if (o.equals("1")) {
-                        blukutukDownload.success();
-                    } else {
-                        blukutukDownload.failed(responseCode, responseMessage);
+                if (!activity.isDestroyed()) {
+                    if (blukutukDownload != null) {
+                        if (o.equals("1")) {
+                            blukutukDownload.success();
+                        } else {
+                            blukutukDownload.failed(responseCode, responseMessage);
+                        }
                     }
-                }
 
-                if (progressDialog != null) {
-                    progressDialog.dismiss();
+                    if (progressDialog != null) {
+                        progressDialog.dismiss();
+                    }
+
+                    if (progressBar != null) {
+                        progressBar.setVisibility(View.GONE);
+                    }
                 }
             }
         });
