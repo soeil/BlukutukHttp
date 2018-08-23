@@ -234,6 +234,11 @@ public class BlukutukHttp {
     }
 
     public void execute() {
+        if (!Network.isNetworkAvailable(activity)) {
+            blukutukFail.result(900, code("900"));
+
+            return;
+        }
         OkHttp okHttp = new OkHttp();
         okHttp.setOkHttpInterface(new OkHttpInterface() {
             @Override
@@ -276,6 +281,12 @@ public class BlukutukHttp {
     }
 
     public void download() {
+        if (!Network.isNetworkAvailable(activity)) {
+            blukutukFail.result(900, code("900"));
+
+            return;
+        }
+
         OkHttpDownload okHttp = new OkHttpDownload();
         okHttp.setOkHttpInterface(new OkHttpInterface() {
             @Override
