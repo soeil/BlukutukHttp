@@ -350,7 +350,7 @@ public class BlukutukHttp {
             }
         });
 
-        okHttp.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        okHttp.execute();
     }
 
     static class OkHttp extends AsyncTask {
