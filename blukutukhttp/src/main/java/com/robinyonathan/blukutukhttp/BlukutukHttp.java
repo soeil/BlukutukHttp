@@ -55,6 +55,7 @@ public class BlukutukHttp {
     private static String pinCertificate = "";
     private static String downloadPath = "";
     private static String downloadFileName = "";
+    private static String url = "";
 
     private static int responseCode = 200;
 
@@ -71,6 +72,12 @@ public class BlukutukHttp {
     public BlukutukHttp(Activity activity, Uri.Builder builder, RequestBody requestBody) {
         this.activity = activity;
         this.builder = builder;
+        this.requestBody = requestBody;
+    }
+
+    public BlukutukHttp(Activity activity, String url, RequestBody requestBody) {
+        this.activity = activity;
+        this.url = url;
         this.requestBody = requestBody;
     }
 
@@ -395,8 +402,14 @@ public class BlukutukHttp {
             }
             OkHttpClient client = builderOkhttp.build();
 
+            String urlTemp = url;
+
+            if (builder != null) {
+                urlTemp = builder.toString();
+            }
+
             Request request = new Request.Builder()
-                    .url(builder.toString())
+                    .url(urlTemp)
 //                    .post((RequestBody) objects[1])
                     .post(new ProgressRequestBody(requestBody, progress -> okHttpInterface.progress(progress)))
                     .build();
@@ -491,10 +504,17 @@ public class BlukutukHttp {
                     return "";
                 }
             }
+
             OkHttpClient client = builderOkhttp.build();
 
+            String urlTemp = url;
+
+            if (builder != null) {
+                urlTemp = builder.toString();
+            }
+
             Request request = new Request.Builder()
-                    .url(builder.toString())
+                    .url(urlTemp)
 //                    .post((RequestBody) objects[1])
                     .post(new ProgressRequestBody(requestBody, progress -> okHttpInterface.progress(progress)))
                     .build();
