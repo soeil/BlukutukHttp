@@ -47,13 +47,13 @@ public class BlukutukHttp {
     private BlukutukModel blukutukModel;
     private BlukutukUploadProgress blukutukUploadProgress;
     private BlukutukDownload blukutukDownload;
+    private static File downloadPath;
     private ProgressBar progressBar;
 
     private static boolean isAcceptAllCertificate = false;
 
     private static String paternCertificate = "";
     private static String pinCertificate = "";
-    private static String downloadPath = "";
     private static String downloadFileName = "";
     private static String url = "";
 
@@ -108,7 +108,7 @@ public class BlukutukHttp {
         this.pinCertificate = pinCertificate;
     }
 
-    public void setDownloadPath(String downloadPath) {
+    public void setDownloadPath(File downloadPath) {
         this.downloadPath = downloadPath;
     }
 
