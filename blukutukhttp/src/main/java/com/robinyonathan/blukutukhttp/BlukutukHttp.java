@@ -75,10 +75,22 @@ public class BlukutukHttp {
         this.requestBody = requestBody;
     }
 
+    public BlukutukHttp(Activity activity, Uri.Builder builder) {
+        this.activity = activity;
+        this.builder = builder;
+        this.requestBody = null;
+    }
+
     public BlukutukHttp(Activity activity, String url, RequestBody requestBody) {
         this.activity = activity;
         this.url = url;
         this.requestBody = requestBody;
+    }
+
+    public BlukutukHttp(Activity activity, String url) {
+        this.activity = activity;
+        this.url = url;
+        this.requestBody = null;
     }
 
     public void useProgressDialog(String message) {
@@ -515,8 +527,6 @@ public class BlukutukHttp {
 
             Request request = new Request.Builder()
                     .url(urlTemp)
-//                    .post((RequestBody) objects[1])
-                    .post(new ProgressRequestBody(requestBody, progress -> okHttpInterface.progress(progress)))
                     .build();
             try {
                 Response response = client.newCall(request).execute();
