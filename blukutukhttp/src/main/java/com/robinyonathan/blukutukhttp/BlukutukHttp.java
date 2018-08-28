@@ -156,6 +156,7 @@ public class BlukutukHttp {
         if (responseMessage.length() == 0) {
             if (blukutukJsonObject != null) {
                 Boolean failedJsonTest = false;
+                String jsonException = "";
 
                 JSONObject result = null;
                 try {
@@ -164,13 +165,14 @@ public class BlukutukHttp {
                     try {
                         new JSONArray((String) o);
                     } catch (JSONException e1) {
+                        jsonException = e1.getMessage();
                         failedJsonTest = true;
                     }
                 }
 
                 if (failedJsonTest) {
                     responseCode = 999;
-                    responseMessage = code("" + 999);
+                    responseMessage = code("" + 999) + ". " + jsonException;
 
                     blukutukFail.result(responseCode, responseMessage);
                 } else {
@@ -180,6 +182,7 @@ public class BlukutukHttp {
 
             if (blukutukJsonArray != null) {
                 Boolean failedJsonTest = false;
+                String jsonException = "";
 
                 JSONArray result = null;
                 try {
@@ -194,7 +197,7 @@ public class BlukutukHttp {
 
                 if (failedJsonTest) {
                     responseCode = 999;
-                    responseMessage = code("" + 999);
+                    responseMessage = code("" + 999) + ". " + jsonException;
 
                     blukutukFail.result(responseCode, responseMessage);
                 } else {
@@ -570,9 +573,9 @@ public class BlukutukHttp {
     public static String code(String code) {
         String result = "";
         if (code.startsWith("5")) {
-            result += "Server error.\nPlease contact customer support and describe your issue.\n";
+            result += "Server error.\nPlease contact customer support and describe your issue\n";
         } else if (code.startsWith("4")) {
-            result += "Connection interrupted.\nPlease contact customer support and describe your issue.\n";
+            result += "Connection interrupted.\nPlease contact customer support and describe your issue\n";
         }
         switch (code) {
             case "505":
