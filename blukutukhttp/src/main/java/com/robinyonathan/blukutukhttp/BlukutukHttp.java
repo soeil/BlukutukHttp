@@ -153,6 +153,17 @@ public class BlukutukHttp {
     }
 
     private void processResult(Object o) {
+        String data = (String) o;
+
+        if (data.length() == 0) {
+            responseCode = 999;
+            responseMessage = code("" + responseCode);
+
+            blukutukFail.result(responseCode, responseMessage);
+
+            return;
+        }
+
         if (responseMessage.length() == 0) {
             if (blukutukJsonObject != null) {
                 Boolean failedJsonTest = false;
@@ -160,19 +171,15 @@ public class BlukutukHttp {
 
                 JSONObject result = null;
                 try {
-                    result = new JSONObject((String) o);
+                    result = new JSONObject(data);
                 } catch (JSONException e) {
-                    try {
-                        new JSONArray((String) o);
-                    } catch (JSONException e1) {
-                        jsonException = e1.getMessage();
-                        failedJsonTest = true;
-                    }
+                    jsonException = e.getMessage();
+                    failedJsonTest = true;
                 }
 
                 if (failedJsonTest) {
                     responseCode = 999;
-                    responseMessage = code("" + 999) + ". " + jsonException;
+                    responseMessage = code("" + responseCode) + ". " + jsonException;
 
                     blukutukFail.result(responseCode, responseMessage);
                 } else {
@@ -186,18 +193,15 @@ public class BlukutukHttp {
 
                 JSONArray result = null;
                 try {
-                    result = new JSONArray((String) o);
+                    result = new JSONArray(data);
                 } catch (JSONException e) {
-                    try {
-                        new JSONArray((String) o);
-                    } catch (JSONException e1) {
-                        failedJsonTest = true;
-                    }
+                    jsonException = e.getMessage();
+                    failedJsonTest = true;
                 }
 
                 if (failedJsonTest) {
                     responseCode = 999;
-                    responseMessage = code("" + 999) + ". " + jsonException;
+                    responseMessage = code("" + responseCode) + ". " + jsonException;
 
                     blukutukFail.result(responseCode, responseMessage);
                 } else {
@@ -209,7 +213,7 @@ public class BlukutukHttp {
                 Boolean failedJsonTest = false;
 
                 Gson gson = new Gson();
-                Object modelResult = gson.fromJson((String) o, (Type) model);
+                Object modelResult = gson.fromJson(data, (Type) model);
 
                 blukutukModel.result(Primitives.wrap(model).cast(modelResult));
             }
