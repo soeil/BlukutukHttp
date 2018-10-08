@@ -260,6 +260,9 @@ public class BlukutukHttp {
     }
 
     public void execute() {
+        responseCode = 0;
+        responseMessage = "";
+
         if (!Network.isNetworkAvailable(activity)) {
             blukutukFail.result(900, code("900"));
 
@@ -307,6 +310,9 @@ public class BlukutukHttp {
     }
 
     public void download() {
+        responseCode = 0;
+        responseMessage = "";
+
         if (!Network.isNetworkAvailable(activity)) {
             blukutukFail.result(900, code("900"));
 
