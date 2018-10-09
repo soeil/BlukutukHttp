@@ -12,6 +12,8 @@
 
 package com.robinyonathan.blukutukhttp;
 
+import android.support.annotation.NonNull;
+
 import java.io.IOException;
 
 import okhttp3.MediaType;
@@ -28,11 +30,10 @@ import okio.Sink;
 
 public class ProgressRequestBody extends RequestBody {
 
-    protected RequestBody mDelegate;
-    protected Listener mListener;
-    protected CountingSink mCountingSink;
+    private RequestBody mDelegate;
+    private Listener mListener;
 
-    public ProgressRequestBody(RequestBody delegate, Listener listener) {
+    ProgressRequestBody(RequestBody delegate, Listener listener) {
         mDelegate = delegate;
         mListener = listener;
     }
@@ -53,8 +54,8 @@ public class ProgressRequestBody extends RequestBody {
     }
 
     @Override
-    public void writeTo(BufferedSink sink) throws IOException {
-        mCountingSink = new CountingSink(sink);
+    public void writeTo(@NonNull BufferedSink sink) throws IOException {
+        CountingSink mCountingSink = new CountingSink(sink);
         BufferedSink bufferedSink = Okio.buffer(mCountingSink);
         mDelegate.writeTo(bufferedSink);
         bufferedSink.flush();
@@ -63,12 +64,12 @@ public class ProgressRequestBody extends RequestBody {
     protected final class CountingSink extends ForwardingSink {
         private long bytesWritten = 0;
 
-        public CountingSink(Sink delegate) {
+        CountingSink(Sink delegate) {
             super(delegate);
         }
 
         @Override
-        public void write(Buffer source, long byteCount) throws IOException {
+        public void write(@NonNull Buffer source, long byteCount) throws IOException {
             super.write(source, byteCount);
             bytesWritten += byteCount;
             mListener.onProgress((int) (100F * bytesWritten / contentLength()));

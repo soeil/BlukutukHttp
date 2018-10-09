@@ -47,25 +47,25 @@ public class BlukutukHttp {
     private BlukutukModel blukutukModel;
     private BlukutukUploadProgress blukutukUploadProgress;
     private BlukutukDownload blukutukDownload;
-    private static File downloadPath;
+    private File downloadPath;
     private ProgressBar progressBar;
 
-    private static boolean isAcceptAllCertificate = false;
+    private boolean isAcceptAllCertificate = false;
 
-    private static String paternCertificate = "";
-    private static String pinCertificate = "";
-    private static String downloadFileName = "";
-    private static String url = "";
+    private String paternCertificate = "";
+    private String pinCertificate = "";
+    private String downloadFileName = "";
+    private String url = "";
 
-    private static int responseCode = 200;
+    private int responseCode = 200;
 
     private ProgressDialog progressDialog;
 
-    private static RequestBody requestBody;
+    private RequestBody requestBody;
 
-    private static String responseMessage = "";
+    private String responseMessage = "";
 
-    private static Uri.Builder builder;
+    private Uri.Builder builder;
 
     private Class<Object> model;
 
@@ -112,7 +112,7 @@ public class BlukutukHttp {
     }
 
     public void setAcceptAllCertificate(boolean isAcceptAllCertificate) {
-        isAcceptAllCertificate = isAcceptAllCertificate;
+        this.isAcceptAllCertificate = isAcceptAllCertificate;
     }
 
     public void setCertificate(String paternCertificate, String pinCertificate) {
@@ -210,8 +210,6 @@ public class BlukutukHttp {
             }
 
             if (blukutukModel != null && model != null) {
-                Boolean failedJsonTest = false;
-
                 Gson gson = new Gson();
                 Object modelResult = gson.fromJson(data, (Type) model);
 
@@ -260,9 +258,6 @@ public class BlukutukHttp {
     }
 
     public void execute() {
-        responseCode = 0;
-        responseMessage = "";
-
         if (!Network.isNetworkAvailable(activity)) {
             blukutukFail.result(900, code("900"));
 
@@ -270,6 +265,46 @@ public class BlukutukHttp {
         }
         OkHttp okHttp = new OkHttp();
         okHttp.setOkHttpInterface(new OkHttpInterface() {
+            @Override
+            public Boolean isAcceptAllCertificate() {
+                return isAcceptAllCertificate;
+            }
+
+            @Override
+            public File downloadPath() {
+                return downloadPath;
+            }
+
+            @Override
+            public RequestBody requestBody() {
+                return requestBody;
+            }
+
+            @Override
+            public String downloadFileName() {
+                return downloadFileName;
+            }
+
+            @Override
+            public String paternCertificate() {
+                return paternCertificate;
+            }
+
+            @Override
+            public String pinCertificate() {
+                return pinCertificate;
+            }
+
+            @Override
+            public String url() {
+                return url;
+            }
+
+            @Override
+            public Uri.Builder builder() {
+                return builder;
+            }
+
             @Override
             public void before() {
                 if (!activity.isDestroyed()) {
@@ -288,6 +323,12 @@ public class BlukutukHttp {
                 if (blukutukUploadProgress != null && !activity.isDestroyed()) {
                     blukutukUploadProgress.result(progress);
                 }
+            }
+
+            @Override
+            public void status(int code, String message) {
+                responseCode = code;
+                responseMessage = message;
             }
 
             @Override
@@ -310,9 +351,6 @@ public class BlukutukHttp {
     }
 
     public void download() {
-        responseCode = 0;
-        responseMessage = "";
-
         if (!Network.isNetworkAvailable(activity)) {
             blukutukFail.result(900, code("900"));
 
@@ -321,6 +359,46 @@ public class BlukutukHttp {
 
         OkHttpDownload okHttp = new OkHttpDownload();
         okHttp.setOkHttpInterface(new OkHttpInterface() {
+            @Override
+            public Boolean isAcceptAllCertificate() {
+                return isAcceptAllCertificate;
+            }
+
+            @Override
+            public File downloadPath() {
+                return downloadPath;
+            }
+
+            @Override
+            public RequestBody requestBody() {
+                return requestBody;
+            }
+
+            @Override
+            public String downloadFileName() {
+                return downloadFileName;
+            }
+
+            @Override
+            public String paternCertificate() {
+                return paternCertificate;
+            }
+
+            @Override
+            public String pinCertificate() {
+                return pinCertificate;
+            }
+
+            @Override
+            public String url() {
+                return url;
+            }
+
+            @Override
+            public Uri.Builder builder() {
+                return builder;
+            }
+
             @Override
             public void before() {
                 if (!activity.isDestroyed()) {
@@ -339,6 +417,12 @@ public class BlukutukHttp {
                 if (blukutukUploadProgress != null && !activity.isDestroyed()) {
                     blukutukUploadProgress.result(progress);
                 }
+            }
+
+            @Override
+            public void status(int code, String message) {
+                responseCode = code;
+                responseMessage = message;
             }
 
             @Override
@@ -387,11 +471,11 @@ public class BlukutukHttp {
                     .writeTimeout(10, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS);
 
-            if (paternCertificate.length() > 0 && pinCertificate.length() > 0) {
-                builderOkhttp.certificatePinner(new CertificatePinner.Builder().add(paternCertificate, pinCertificate).build());
+            if (okHttpInterface.paternCertificate().length() > 0 && okHttpInterface.pinCertificate().length() > 0) {
+                builderOkhttp.certificatePinner(new CertificatePinner.Builder().add(okHttpInterface.paternCertificate(), okHttpInterface.pinCertificate()).build());
             }
 
-            if (isAcceptAllCertificate) {
+            if (okHttpInterface.isAcceptAllCertificate()) {
                 final TrustManager[] trustAllCerts = new TrustManager[]{
                         new X509TrustManager() {
                             @Override
@@ -416,27 +500,27 @@ public class BlukutukHttp {
 
                     builderOkhttp.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
                 } catch (NoSuchAlgorithmException e) {
-                    responseCode = 904;
-                    responseMessage = e.getMessage();
+                    okHttpInterface.status(904, e.getMessage());
+
                     return "";
                 } catch (KeyManagementException e) {
-                    responseCode = 905;
-                    responseMessage = e.getMessage();
+                    okHttpInterface.status(905, e.getMessage());
+
                     return "";
                 }
             }
             OkHttpClient client = builderOkhttp.build();
 
-            String urlTemp = url;
+            String urlTemp = okHttpInterface.url();
 
-            if (builder != null) {
-                urlTemp = builder.toString();
+            if (okHttpInterface.builder() != null) {
+                urlTemp = okHttpInterface.builder().toString();
             }
 
             Request request = new Request.Builder()
                     .url(urlTemp)
 //                    .post((RequestBody) objects[1])
-                    .post(new ProgressRequestBody(requestBody, progress -> okHttpInterface.progress(progress)))
+                    .post(new ProgressRequestBody(okHttpInterface.requestBody(), progress -> okHttpInterface.progress(progress)))
                     .build();
             try {
                 Response response = client.newCall(request).execute();
@@ -444,21 +528,20 @@ public class BlukutukHttp {
                 ResponseBody responseBody = response.body();
 
                 if (!response.isSuccessful() && responseBody != null) {
-                    responseCode = 900;
+                    okHttpInterface.status(900, "");
 
                     return responseBody.string();
                 } else if (responseBody != null) {
-                    responseCode = response.code();
+                    okHttpInterface.status(response.code(), "");
 
                     return responseBody.string();
                 } else {
-                    responseCode = 900;
+                    okHttpInterface.status(900, "");
 
                     return "";
                 }
             } catch (Exception e) {
-                responseCode = 900;
-                responseMessage = e.getMessage();
+                okHttpInterface.status(900, e.getMessage());
 
                 return "";
             }
@@ -491,11 +574,11 @@ public class BlukutukHttp {
                     .writeTimeout(10, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS);
 
-            if (paternCertificate.length() > 0 && pinCertificate.length() > 0) {
-                builderOkhttp.certificatePinner(new CertificatePinner.Builder().add(paternCertificate, pinCertificate).build());
+            if (okHttpInterface.paternCertificate().length() > 0 && okHttpInterface.pinCertificate().length() > 0) {
+                builderOkhttp.certificatePinner(new CertificatePinner.Builder().add(okHttpInterface.paternCertificate(), okHttpInterface.pinCertificate()).build());
             }
 
-            if (isAcceptAllCertificate) {
+            if (okHttpInterface.isAcceptAllCertificate()) {
                 final TrustManager[] trustAllCerts = new TrustManager[]{
                         new X509TrustManager() {
                             @Override
@@ -520,22 +603,22 @@ public class BlukutukHttp {
 
                     builderOkhttp.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
                 } catch (NoSuchAlgorithmException e) {
-                    responseCode = 904;
-                    responseMessage = e.getMessage();
+                    okHttpInterface.status(904, e.getMessage());
+
                     return "";
                 } catch (KeyManagementException e) {
-                    responseCode = 905;
-                    responseMessage = e.getMessage();
+                    okHttpInterface.status(905, e.getMessage());
+
                     return "";
                 }
             }
 
             OkHttpClient client = builderOkhttp.build();
 
-            String urlTemp = url;
+            String urlTemp = okHttpInterface.url();
 
-            if (builder != null) {
-                urlTemp = builder.toString();
+            if (okHttpInterface.builder() != null) {
+                urlTemp = okHttpInterface.builder().toString();
             }
 
             Request request = new Request.Builder()
@@ -545,12 +628,14 @@ public class BlukutukHttp {
                 Response response = client.newCall(request).execute();
 
                 if (!response.isSuccessful()) {
-                    responseCode = 901;
+                    okHttpInterface.status(901, "");
+
                     return "";
                 } else {
-                    responseCode = response.code();
+                    okHttpInterface.status(response.code(), "");
+
                     try {
-                        File file = new File(downloadPath, downloadFileName);
+                        File file = new File(okHttpInterface.downloadPath(), okHttpInterface.downloadFileName());
                         BufferedSink sink = Okio.buffer(Okio.sink(file));
                         BufferedSource bufferedSource = response.body().source();
                         if (bufferedSource != null) {
@@ -567,8 +652,7 @@ public class BlukutukHttp {
                     }
                 }
             } catch (Exception e) {
-                responseCode = 900;
-                responseMessage = e.getMessage();
+                okHttpInterface.status(900, e.getMessage());
 
                 return "";
             }
