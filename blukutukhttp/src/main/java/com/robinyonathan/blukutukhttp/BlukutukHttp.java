@@ -47,27 +47,28 @@ public class BlukutukHttp {
     private BlukutukModel blukutukModel;
     private BlukutukUploadProgress blukutukUploadProgress;
     private BlukutukDownload blukutukDownload;
-    private File downloadPath;
-    private ProgressBar progressBar;
+
+    private Class<Object> model;
 
     private boolean isAcceptAllCertificate = false;
 
-    private String paternCertificate = "";
-    private String pinCertificate = "";
-    private String downloadFileName = "";
-    private String url = "";
+    private File downloadPath;
 
     private int responseCode = 200;
+
+    private ProgressBar progressBar;
 
     private ProgressDialog progressDialog;
 
     private RequestBody requestBody;
 
+    private String downloadFileName = "";
+    private String paternCertificate = "";
+    private String pinCertificate = "";
     private String responseMessage = "";
+    private String url = "";
 
     private Uri.Builder builder;
-
-    private Class<Object> model;
 
     public BlukutukHttp(Activity activity, Uri.Builder builder, RequestBody requestBody) {
         this.activity = activity;
