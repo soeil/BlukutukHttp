@@ -156,7 +156,7 @@ public class BlukutukHttp {
     private void processResult(Object o) {
         String data = (String) o;
 
-        if (data.length() == 0) {
+        if (data.length() == 0 && responseMessage.length() == 0) {
             responseCode = 999;
             responseMessage = code("" + responseCode);
 
@@ -529,15 +529,15 @@ public class BlukutukHttp {
                 ResponseBody responseBody = response.body();
 
                 if (!response.isSuccessful() && responseBody != null) {
-                    okHttpInterface.status(900, "");
+                    okHttpInterface.status(response.code(), "Exception");
 
                     return responseBody.string();
                 } else if (responseBody != null) {
-                    okHttpInterface.status(response.code(), "");
+                    okHttpInterface.status(response.code(), "Exception");
 
                     return responseBody.string();
                 } else {
-                    okHttpInterface.status(900, "");
+                    okHttpInterface.status(response.code(), "Exception");
 
                     return "";
                 }
