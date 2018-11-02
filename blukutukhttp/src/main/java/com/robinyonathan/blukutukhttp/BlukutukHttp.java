@@ -528,12 +528,12 @@ public class BlukutukHttp {
 
                 ResponseBody responseBody = response.body();
 
-                if (!response.isSuccessful() && responseBody != null) {
+                if (!response.isSuccessful() || response.code() != 200) {
                     okHttpInterface.status(response.code(), "Exception");
 
-                    return responseBody.string();
+                    return "";
                 } else if (responseBody != null) {
-                    okHttpInterface.status(response.code(), "Exception");
+                    okHttpInterface.status(response.code(), "");
 
                     return responseBody.string();
                 } else {
