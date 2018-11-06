@@ -4,6 +4,9 @@ jobs:
     working_directory: ~/blukutukhttp
     docker:
       - image: circleci/android:api-28-alpha
+    machine:
+      java:
+        version: 'oraclejdk8'
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
