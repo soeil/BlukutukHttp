@@ -219,7 +219,11 @@ public class BlukutukHttp {
 
         } else {
             if (blukutukFail != null) {
-                blukutukFail.result(responseCode, responseMessage);
+                if (responseMessage.equals("Exception")) {
+                    blukutukFail.result(responseCode, code("" + responseCode));
+                } else {
+                    blukutukFail.result(responseCode, responseMessage);
+                }
             }
         }
     }
