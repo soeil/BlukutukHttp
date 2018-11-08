@@ -546,7 +546,11 @@ public class BlukutukHttp {
                     return "";
                 }
             } catch (Exception e) {
-                okHttpInterface.status(900, e.getMessage());
+                if (e.getMessage() != null) {
+                    okHttpInterface.status(900, e.getMessage());
+                } else {
+                    okHttpInterface.status(900, "Exception");
+                }
 
                 return "";
             }
