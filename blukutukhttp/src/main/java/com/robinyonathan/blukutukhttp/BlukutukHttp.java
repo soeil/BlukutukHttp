@@ -345,7 +345,7 @@ public class BlukutukHttp {
             @Override
             public void progress(int progress) {
                 if (blukutukUploadProgress != null && !activity.isDestroyed()) {
-                    blukutukUploadProgress.result(progress);
+                    activity.runOnUiThread(() -> blukutukUploadProgress.result(progress));
                 }
             }
 
@@ -448,7 +448,7 @@ public class BlukutukHttp {
             @Override
             public void progress(int progress) {
                 if (blukutukUploadProgress != null && !activity.isDestroyed()) {
-                    blukutukUploadProgress.result(progress);
+                    activity.runOnUiThread(() -> blukutukUploadProgress.result(progress));
                 }
             }
 
@@ -500,7 +500,6 @@ public class BlukutukHttp {
         @Override
         protected Object doInBackground(final Object[] objects) {
             HashMap<Integer, Integer> hashMap = okHttpInterface.getConnectionTimeOut();
-
             OkHttpClient.Builder builderOkhttp = new OkHttpClient.Builder()
                     .connectTimeout(hashMap.get(0), TimeUnit.SECONDS)
                     .writeTimeout(hashMap.get(1), TimeUnit.SECONDS)
