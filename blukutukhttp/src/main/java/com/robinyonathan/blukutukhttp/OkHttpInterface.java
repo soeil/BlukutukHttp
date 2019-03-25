@@ -3,6 +3,7 @@ package com.robinyonathan.blukutukhttp;
 import android.net.Uri;
 
 import java.io.File;
+import java.util.HashMap;
 
 import okhttp3.RequestBody;
 
@@ -22,6 +23,8 @@ public interface OkHttpInterface {
     String url();
 
     Uri.Builder builder();
+
+    HashMap<Integer, Integer> getConnectionTimeOut();
 
     void before();
 

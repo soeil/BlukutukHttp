@@ -21,6 +21,7 @@ import java.lang.reflect.Type;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
@@ -55,6 +56,9 @@ public class BlukutukHttp {
     private File downloadPath;
 
     private int responseCode = 200;
+    private int connectionTimeOut = 10;
+    private int writeTimeOut = 10;
+    private int readTimeOut = 10;
 
     private ProgressBar progressBar;
 
@@ -151,6 +155,12 @@ public class BlukutukHttp {
 
     public void setDownloadListener(BlukutukDownload blukutukDownload) {
         this.blukutukDownload = blukutukDownload;
+    }
+
+    public void setConnectionTimeOut(int connectionTimeOut, int writeTimeOut, int readTimeOut) {
+        this.connectionTimeOut = connectionTimeOut;
+        this.writeTimeOut = writeTimeOut;
+        this.readTimeOut = readTimeOut;
     }
 
     private void processResult(Object o) {
@@ -306,6 +316,15 @@ public class BlukutukHttp {
             }
 
             @Override
+            public HashMap<Integer, Integer> getConnectionTimeOut() {
+                HashMap<Integer, Integer> hashMap = new HashMap<>();
+                hashMap.put(0, connectionTimeOut);
+                hashMap.put(1, writeTimeOut);
+                hashMap.put(2, readTimeOut);
+                return hashMap;
+            }
+
+            @Override
             public Uri.Builder builder() {
                 return builder;
             }
@@ -405,6 +424,15 @@ public class BlukutukHttp {
             }
 
             @Override
+            public HashMap<Integer, Integer> getConnectionTimeOut() {
+                HashMap<Integer, Integer> hashMap = new HashMap<>();
+                hashMap.put(0, connectionTimeOut);
+                hashMap.put(1, writeTimeOut);
+                hashMap.put(2, readTimeOut);
+                return hashMap;
+            }
+
+            @Override
             public void before() {
                 if (!activity.isDestroyed()) {
                     if (progressDialog != null) {
@@ -471,10 +499,12 @@ public class BlukutukHttp {
 
         @Override
         protected Object doInBackground(final Object[] objects) {
+            HashMap<Integer, Integer> hashMap = okHttpInterface.getConnectionTimeOut();
+
             OkHttpClient.Builder builderOkhttp = new OkHttpClient.Builder()
-                    .connectTimeout(10, TimeUnit.SECONDS)
-                    .writeTimeout(10, TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS);
+                    .connectTimeout(hashMap.get(0), TimeUnit.SECONDS)
+                    .writeTimeout(hashMap.get(1), TimeUnit.SECONDS)
+                    .readTimeout(hashMap.get(2), TimeUnit.SECONDS);
 
             if (okHttpInterface.paternCertificate().length() > 0 && okHttpInterface.pinCertificate().length() > 0) {
                 builderOkhttp.certificatePinner(new CertificatePinner.Builder().add(okHttpInterface.paternCertificate(), okHttpInterface.pinCertificate()).build());
@@ -578,10 +608,12 @@ public class BlukutukHttp {
 
         @Override
         protected Object doInBackground(final Object[] objects) {
+            HashMap<Integer, Integer> hashMap = okHttpInterface.getConnectionTimeOut();
+
             OkHttpClient.Builder builderOkhttp = new OkHttpClient.Builder()
-                    .connectTimeout(10, TimeUnit.SECONDS)
-                    .writeTimeout(10, TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS);
+                    .connectTimeout(hashMap.get(0), TimeUnit.SECONDS)
+                    .writeTimeout(hashMap.get(1), TimeUnit.SECONDS)
+                    .readTimeout(hashMap.get(2), TimeUnit.SECONDS);
 
             if (okHttpInterface.paternCertificate().length() > 0 && okHttpInterface.pinCertificate().length() > 0) {
                 builderOkhttp.certificatePinner(new CertificatePinner.Builder().add(okHttpInterface.paternCertificate(), okHttpInterface.pinCertificate()).build());
