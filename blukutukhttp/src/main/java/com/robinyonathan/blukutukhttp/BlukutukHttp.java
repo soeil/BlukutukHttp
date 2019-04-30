@@ -1,6 +1,8 @@
 package com.robinyonathan.blukutukhttp;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -22,6 +24,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
@@ -52,6 +55,7 @@ public class BlukutukHttp {
     private Class<Object> model;
 
     private boolean isAcceptAllCertificate = false;
+    private boolean isFragment = false;
 
     private File downloadPath;
 
@@ -71,6 +75,7 @@ public class BlukutukHttp {
     private String pinCertificate = "";
     private String responseMessage = "";
     private String url = "";
+    private String fragmentTag = "";
 
     private Uri.Builder builder;
 
@@ -163,6 +168,11 @@ public class BlukutukHttp {
         this.readTimeOut = readTimeOut;
     }
 
+    public void setIsFragment(boolean isFragment, String fragmentTag) {
+        this.isFragment = isFragment;
+        this.fragmentTag = fragmentTag;
+    }
+
     private void processResult(Object o) {
         String data = (String) o;
 
@@ -199,7 +209,7 @@ public class BlukutukHttp {
             }
 
             if (blukutukJsonArray != null) {
-                Boolean failedJsonTest = false;
+                boolean failedJsonTest = false;
                 String jsonException = "";
 
                 JSONArray result = null;
@@ -239,7 +249,7 @@ public class BlukutukHttp {
     }
 
     public Boolean jsonObjectTest(String o) {
-        Boolean failedJsonTest = false;
+        boolean failedJsonTest = false;
 
         JSONObject result = null;
         try {
@@ -256,7 +266,7 @@ public class BlukutukHttp {
     }
 
     public Boolean jsonArrayTest(String o) {
-        Boolean failedJsonTest = false;
+        boolean failedJsonTest = false;
 
         JSONArray result = null;
         try {
@@ -357,7 +367,14 @@ public class BlukutukHttp {
 
             @Override
             public void after(Object o) {
-                if (!activity.isDestroyed()) {
+                boolean noFragmentProblem = true;
+                if (isFragment) {
+                    Fragment temp = activity.getFragmentManager().findFragmentByTag(fragmentTag);
+                    if (temp == null) {
+                        noFragmentProblem = false;
+                    }
+                }
+                if (!activity.isDestroyed() || noFragmentProblem) {
                     processResult(o);
 
                     if (progressDialog != null) {
@@ -483,6 +500,7 @@ public class BlukutukHttp {
         okHttp.execute();
     }
 
+    @SuppressWarnings("ConstantConditions")
     static class OkHttp extends AsyncTask {
 
         OkHttpInterface okHttpInterface;
@@ -512,10 +530,12 @@ public class BlukutukHttp {
             if (okHttpInterface.isAcceptAllCertificate()) {
                 final TrustManager[] trustAllCerts = new TrustManager[]{
                         new X509TrustManager() {
+                            @SuppressLint("TrustAllX509TrustManager")
                             @Override
                             public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
                             }
 
+                            @SuppressLint("TrustAllX509TrustManager")
                             @Override
                             public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
                             }
@@ -553,9 +573,15 @@ public class BlukutukHttp {
 
             Request request = new Request.Builder()
                     .url(urlTemp)
-//                    .post((RequestBody) objects[1])
-                    .post(new ProgressRequestBody(okHttpInterface.requestBody(), progress -> okHttpInterface.progress(progress)))
                     .build();
+
+            if (okHttpInterface.requestBody() != null) {
+                request = new Request.Builder()
+                        .url(urlTemp)
+//                    .post((RequestBody) objects[1])
+                        .post(new ProgressRequestBody(okHttpInterface.requestBody(), progress -> okHttpInterface.progress(progress)))
+                        .build();
+            }
             try {
                 Response response = client.newCall(request).execute();
 
@@ -591,6 +617,7 @@ public class BlukutukHttp {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     static class OkHttpDownload extends AsyncTask {
 
         OkHttpInterface okHttpInterface;
@@ -621,10 +648,12 @@ public class BlukutukHttp {
             if (okHttpInterface.isAcceptAllCertificate()) {
                 final TrustManager[] trustAllCerts = new TrustManager[]{
                         new X509TrustManager() {
+                            @SuppressLint("TrustAllX509TrustManager")
                             @Override
                             public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
                             }
 
+                            @SuppressLint("TrustAllX509TrustManager")
                             @Override
                             public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
                             }
