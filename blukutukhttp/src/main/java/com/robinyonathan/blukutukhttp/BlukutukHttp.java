@@ -75,7 +75,7 @@ public class BlukutukHttp {
     private String pinCertificate = "";
     private String responseMessage = "";
     private String url = "";
-    private String fragmentTag = "";
+    private Fragment fragment = null;
 
     private Uri.Builder builder;
 
@@ -168,9 +168,9 @@ public class BlukutukHttp {
         this.readTimeOut = readTimeOut;
     }
 
-    public void setIsFragment(boolean isFragment, String fragmentTag) {
+    public void setIsFragment(boolean isFragment, Fragment fragment) {
         this.isFragment = isFragment;
-        this.fragmentTag = fragmentTag;
+        this.fragment = fragment;
     }
 
     private void processResult(Object o) {
@@ -368,10 +368,16 @@ public class BlukutukHttp {
             @Override
             public void after(Object o) {
                 boolean noFragmentProblem = true;
-                if (isFragment) {
-                    Fragment temp = activity.getFragmentManager().findFragmentByTag(fragmentTag);
-                    if (temp == null) {
+                if (isFragment && fragment != null) {
+                    if (fragment.getActivity() == null) {
                         noFragmentProblem = false;
+                    } else {
+                        if (fragment.getActivity().isDestroyed()) {
+                            noFragmentProblem = false;
+                        }
+                        if (fragment.isDetached()) {
+                            noFragmentProblem = false;
+                        }
                     }
                 }
                 if (!activity.isDestroyed() || noFragmentProblem) {
