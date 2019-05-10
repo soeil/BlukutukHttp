@@ -12,6 +12,8 @@ public interface OkHttpInterface {
 
     File downloadPath();
 
+    int getBodyType();
+
     RequestBody requestBody();
 
     String downloadFileName();

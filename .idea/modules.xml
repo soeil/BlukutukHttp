@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Blukutuk2.iml" filepath="$PROJECT_DIR$/Blukutuk2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BlukutukHttp.iml" filepath="$PROJECT_DIR$/BlukutukHttp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/blukutukhttp/blukutukhttp.iml" filepath="$PROJECT_DIR$/blukutukhttp/blukutukhttp.iml" />
     </modules>
