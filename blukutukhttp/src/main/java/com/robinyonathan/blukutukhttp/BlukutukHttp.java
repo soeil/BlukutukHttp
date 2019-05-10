@@ -63,6 +63,7 @@ public class BlukutukHttp {
 
     public final static int POST = 1;
     public final static int PUT = 2;
+    public final static int DELETE = 2;
 
     private int responseCode = 200;
     private int connectionTimeOut = 10;
@@ -623,6 +624,13 @@ public class BlukutukHttp {
                             .url(urlTemp)
 //                    .post((RequestBody) objects[1])
                             .put(new ProgressRequestBody(okHttpInterface.requestBody(), progress -> okHttpInterface.progress(progress)))
+                            .build();
+                }
+                if (okHttpInterface.getBodyType() == DELETE) {
+                    request = new Request.Builder()
+                            .url(urlTemp)
+//                    .post((RequestBody) objects[1])
+                            .delete(new ProgressRequestBody(okHttpInterface.requestBody(), progress -> okHttpInterface.progress(progress)))
                             .build();
                 }
             }
